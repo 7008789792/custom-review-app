@@ -30,3 +30,13 @@ model Session {
   collaborator  Boolean?  @default(false)
   emailVerified Boolean?  @default(false)
 }
+
+
+model ReviewSnippet {
+  id        String   @id @default(cuid())
+  productId String   // Shopify Product GID
+  snippet   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+

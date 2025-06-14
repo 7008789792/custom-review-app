@@ -3,11 +3,12 @@
 client_id = "71a961e9af74de0a5e34ce0f14ebda62"
 name = "custom-review-app"
 handle = "custom-review-app"
-application_url = "https://example.com/"
+application_url = "https://pal-australia-projector-choosing.trycloudflare.com"
 embedded = true
 
 [build]
 include_config_on_deploy = true
+automatically_update_urls_on_dev = true
 
 [webhooks]
 api_version = "2025-04"
@@ -25,7 +26,11 @@ api_version = "2025-04"
 scopes = "write_products"
 
 [auth]
-redirect_urls = [ "https://example.com/api/auth" ]
+redirect_urls = [
+  "https://pal-australia-projector-choosing.trycloudflare.com/auth/callback",
+  "https://pal-australia-projector-choosing.trycloudflare.com/auth/shopify/callback",
+  "https://pal-australia-projector-choosing.trycloudflare.com/api/auth/callback"
+]
 
 [pos]
 embedded = false
