@@ -3,7 +3,7 @@
 client_id = "71a961e9af74de0a5e34ce0f14ebda62"
 name = "custom-review-app"
 handle = "custom-review-app"
-application_url = "https://pal-australia-projector-choosing.trycloudflare.com"
+application_url = "https://israeli-pensions-helena-touch.trycloudflare.com"
 embedded = true
 
 [build]
@@ -23,13 +23,13 @@ api_version = "2025-04"
 
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-scopes = "write_products"
+scopes = "write_products, read_products"
 
 [auth]
 redirect_urls = [
-  "https://pal-australia-projector-choosing.trycloudflare.com/auth/callback",
-  "https://pal-australia-projector-choosing.trycloudflare.com/auth/shopify/callback",
-  "https://pal-australia-projector-choosing.trycloudflare.com/api/auth/callback"
+  "https://israeli-pensions-helena-touch.trycloudflare.com/auth/callback",
+  "https://israeli-pensions-helena-touch.trycloudflare.com/auth/shopify/callback",
+  "https://israeli-pensions-helena-touch.trycloudflare.com/api/auth/callback"
 ]
 
 [pos]

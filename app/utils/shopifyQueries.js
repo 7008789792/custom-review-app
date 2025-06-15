@@ -89,19 +89,6 @@ export const PRODUCT_UPDATE_MUTATION = `
   }
 `
 
-
-export const PRODUCT_DELETE_MUTATION = `
-  mutation productDelete($input: ProductDeleteInput!) {
-    productDelete(input: $input) {
-      deletedProductId
-      userErrors {
-        field
-        message
-      }
-    }
-  }
-`
-
 export const PRODUCT_UPDATE_PRICE_MUTATION = `
   mutation productVariantsBulkUpdate($productId: ID!, $variants: [ProductVariantsBulkInput!]!) {
     productVariantsBulkUpdate(productId: $productId, variants: $variants) {

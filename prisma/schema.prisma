@@ -36,7 +36,5 @@ model ReviewSnippet {
   id        String   @id @default(cuid())
   productId String   // Shopify Product GID
   snippet   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 

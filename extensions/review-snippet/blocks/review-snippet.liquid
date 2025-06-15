@@ -1,0 +1,56 @@
+{% assign gid = product.id | json %}
+
+<div class="custom-review-wrapper" id="custom-review-snippet" data-product-id="{{ gid }}">
+  {% if block.settings.show_heading %}
+    <h3>{{ block.settings.heading }}</h3>
+  {% endif %}
+  <div id="review-snippet-content">Loading review...</div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', async () => {
+    const container = document.getElementById('custom-review-snippet');
+    const productId = container.dataset.productId;
+
+    console.log("Product ID:", productId);
+
+    try {
+      const response = await fetch(`/apps/proxyreview?productId=${encodeURIComponent(productId)}`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("Fetched Data:", data);
+
+      const snippetContainer = document.getElementById('review-snippet-content');
+      snippetContainer.innerHTML = data?.snippet || 'No reviews available.';
+    } catch (error) {
+      console.error('Failed to fetch review snippet:', error);
+    }
+  });
+</script>
+
+
+
+{% schema %}
+{
+  "name": "Review Snippet",
+  "target": "section",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_heading",
+      "default": true,
+      "label": "Show Heading"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "default": "Customer Review",
+      "label": "Heading"
+    }
+  ]
+}
+{% endschema %}
