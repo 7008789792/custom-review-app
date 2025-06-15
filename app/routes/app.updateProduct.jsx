@@ -2,7 +2,6 @@ import {
   useLoaderData,
   useFetcher,
   useSearchParams,
-  Form,
 } from '@remix-run/react'
 import {
   Page,
@@ -13,8 +12,6 @@ import {
   BlockStack,
   Toast,
   Frame,
-  Text,
-  InlineStack,
   Box
 } from '@shopify/polaris'
 import { useState, useEffect } from 'react'
@@ -121,7 +118,7 @@ export default function ProductsPage() {
     setSelectedProduct(product)
     setVariantId(variant.id)
     setPrice(variant.price)
-    setReviewSnippet(matchedSnippet?.snippet || '') // Set found snippet or fallback to empty
+    setReviewSnippet(matchedSnippet?.snippet || '')
     setModalOpen(true)
   }
 
