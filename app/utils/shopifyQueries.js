@@ -1,8 +1,8 @@
 import { authenticate } from '../shopify.server'
 
 export const GET_PRODUCTS_QUERY = `
-  query getProducts($first: Int!, $query: String, $after: String) {
-    products(first: $first, query: $query, after: $after) {
+  query getProducts($first: Int, $last: Int, $query: String, $after: String, $before: String) {
+    products(first: $first, last: $last, query: $query, after: $after, before: $before) {
       edges {
         node {
           id
@@ -26,19 +26,24 @@ export const GET_PRODUCTS_QUERY = `
       }
       pageInfo {
         hasNextPage
+        hasPreviousPage
+        startCursor
         endCursor
       }
     }
   }
 `
 
-export async function getProducts(request, searchQuery = '', after = null) {
+
+export async function getProducts(request, searchQuery = '', { after = null, before = null } = {}) {
   const { admin } = await authenticate.admin(request)
 
   const variables = {
-    first: 10,
+    first: before ? undefined : 10,
+    last: before ? 10 : undefined,
     query: searchQuery ? `title:*${searchQuery}*` : undefined,
-    after: after || undefined,
+    after: before ? undefined : after,
+    before: before || undefined,
   }
 
   const response = await admin.graphql(GET_PRODUCTS_QUERY, { variables })
@@ -47,10 +52,14 @@ export async function getProducts(request, searchQuery = '', after = null) {
   const edges = json?.data?.products?.edges || []
   const products = edges.map((edge) => edge.node)
 
+  const pageInfo = json?.data?.products?.pageInfo
+
   return {
     products,
-    hasNextPage: json?.data?.products?.pageInfo?.hasNextPage,
-    endCursor: json?.data?.products?.pageInfo?.endCursor,
+    hasNextPage: pageInfo?.hasNextPage,
+    hasPreviousPage: pageInfo?.hasPreviousPage,
+    startCursor: pageInfo?.startCursor,
+    endCursor: pageInfo?.endCursor,
   }
 }
 

@@ -26,10 +26,18 @@ import db from '../db.server'
 export const loader = async ({ request }) => {
   const url = new URL(request.url)
   const searchQuery = url.searchParams.get('q') || ''
-  const after = url.searchParams.get('after') || null
-  const productsData = await getProducts(request, searchQuery, after)
-  const review = await db.reviewSnippet.findMany();
-  return Response.json({ ...productsData, searchQuery, reviewSnippets: review })
+  const after = url.searchParams.get('after')
+  const before = url.searchParams.get('before')
+
+  const productsData = await getProducts(request, searchQuery, { after, before })
+
+  const review = await db.reviewSnippet.findMany()
+
+  return Response.json({
+    ...productsData,
+    searchQuery,
+    reviewSnippets: review,
+  })
 }
 
 export const action = async ({ request }) => {
@@ -92,7 +100,7 @@ export const action = async ({ request }) => {
 }
 
 export default function ProductsPage() {
-  const { products, hasNextPage, endCursor, reviewSnippets } = useLoaderData()
+  const { products, hasNextPage, hasPreviousPage, endCursor, startCursor, reviewSnippets } = useLoaderData()
   const fetcher = useFetcher()
   const [searchParams, setSearchParams] = useSearchParams()
 
@@ -103,6 +111,7 @@ export default function ProductsPage() {
   const [toastActive, setToastActive] = useState(false)
   const [toastMessage, setToastMessage] = useState('')
   const [reviewSnippet, setReviewSnippet] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
 
   const isUpdating = fetcher.state === 'submitting'
 
@@ -136,10 +145,20 @@ export default function ProductsPage() {
     setModalOpen(false)
   }
 
-  const loadMore = () => {
+  const loadNext = () => {
     const params = Object.fromEntries(searchParams.entries())
     params.after = endCursor
+    delete params.before
     setSearchParams(params)
+    setCurrentPage(prev => prev + 1)
+  }
+
+  const loadPrevious = () => {
+    const params = Object.fromEntries(searchParams.entries())
+    params.before = startCursor
+    delete params.after
+    setSearchParams(params)
+    setCurrentPage(prev => Math.max(1, prev - 1))
   }
 
   useEffect(() => {
@@ -158,25 +177,51 @@ export default function ProductsPage() {
         title="All Products"
       >
 
-        <Box paddingBlockStart="400">
-          <Layout>
-            {products.map(product => (
-              <Layout.Section key={product.id}>
-                <ProductCard
-                  product={product}
-                  onEdit={() => openEditModal(product)}
-                  reviewSnippet={reviewSnippets?.find(snippet => snippet.productId === product.id)}
-                />
-              </Layout.Section>
-            ))}
-          </Layout>
-        </Box>
+<div
+  style={{
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(48%, 1fr))',
+    gap: '1.5rem',
+    paddingInline: '1rem',
+  }}
+>
+  {products.map(product => (
+    <ProductCard
+      key={product.id}
+      product={product}
+      onEdit={() => openEditModal(product)}
+      reviewSnippet={reviewSnippets?.find(snippet => snippet.productId === product.id)}
+    />
+  ))}
+</div>
 
-        {hasNextPage && (
-          <Box paddingBlockStart="400" paddingInlineStart="400">
-            <Button onClick={loadMore}>Load More</Button>
-          </Box>
-        )}
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginTop: '1rem',
+            marginBottom: '1rem',
+            gap: '1rem',
+          }}
+        >
+          <Button
+            onClick={loadPrevious}
+            variant="secondary"
+            disabled={!hasPreviousPage || isUpdating}
+          >
+            Previous
+          </Button>
+
+          <span style={{ minWidth: '60px', textAlign: 'center' }}>Page {currentPage}</span>
+
+          <Button
+            onClick={loadNext}
+            disabled={!hasNextPage || isUpdating}
+          >
+            Next
+          </Button>
+        </div>
 
         <Modal
           open={modalOpen}
